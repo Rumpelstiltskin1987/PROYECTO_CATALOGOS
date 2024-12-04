@@ -1,18 +1,19 @@
 ﻿@model DataAccess.Product
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<h1>Edit</h1>
 
 <h4>Product</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -33,13 +34,17 @@
                 <input asp-for="Quantity" class="form-control" />
                 <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="UrlImage" class="control-label"></label>
-                <input asp-for="UrlImage" class="form-control" />
+            <div class="form-group" style="display:none;">
+                <label asp-for="UrlImage" class="control-label">Ruta Imagen</label>
+                <input asp-for="UrlImage" class="form-control" value="\\images\\" id="UrlImage" />
                 <span asp-validation-for="UrlImage" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label for="ProductImage" class="control-label">Imagen del Producto</label>
+                <input type="file" id="ProductImage" name="ProductImage" class="form-control" onchange="updateUrlImage()" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -50,5 +55,18 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        function updateUrlImage() {
+            var input = document.getElementById('ProductImage');
+            var urlImageInput = document.getElementById('UrlImage');
+            if (input.files.length > 0) {
+                var fileName = input.files[0].name;
+                urlImageInput.value = '\\images\\' + fileName;
+            }
+        }
+    </script>
 }

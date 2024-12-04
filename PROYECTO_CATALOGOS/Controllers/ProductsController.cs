@@ -53,16 +53,29 @@ namespace PROYECTO_CATALOGOS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,Quantity,UrlImage")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,Quantity,UrlImage")] Product product, IFormFile ProductImage)
         {
             if (ModelState.IsValid)
             {
+                if (ProductImage != null && ProductImage.Length > 0)
+                {
+                    // Ruta donde se guardará la imagen
+                    var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", ProductImage.FileName);
+
+                    // Guardar la imagen en la ruta especificada
+                    using (var stream = new FileStream(imagePath, FileMode.Create))
+                    {
+                        await ProductImage.CopyToAsync(stream);
+                    }
+                }
+
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
+
 
         // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -85,7 +98,7 @@ namespace PROYECTO_CATALOGOS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Quantity,UrlImage")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Quantity,UrlImage")] Product product, IFormFile ProductImage)
         {
             if (id != product.Id)
             {
@@ -96,6 +109,18 @@ namespace PROYECTO_CATALOGOS.Controllers
             {
                 try
                 {
+                    if (ProductImage != null && ProductImage.Length > 0)
+                    {
+                        // Ruta donde se guardará la imagen
+                        var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", ProductImage.FileName);
+
+                        // Guardar la imagen en la ruta especificada
+                        using (var stream = new FileStream(imagePath, FileMode.Create))
+                        {
+                            await ProductImage.CopyToAsync(stream);
+                        }
+                    }
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
