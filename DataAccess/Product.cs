@@ -23,9 +23,4 @@ namespace DataAccess
         public string UrlImage { get; set; }
 
     }
-
-    public class ProductList
-    {
-        public List<Product> Products { get; set; } = new List<Product>();
-    }
 }

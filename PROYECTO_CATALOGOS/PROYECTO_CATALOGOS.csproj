@@ -30,6 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CATALOGOS.BUSINESS\CATALOGOS.BUSINESS.csproj" />
+    <ProjectReference Include="..\CATALOGOS.INTERFACES\CATALOGOS.INTERFACES.csproj" />
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
   </ItemGroup>
 

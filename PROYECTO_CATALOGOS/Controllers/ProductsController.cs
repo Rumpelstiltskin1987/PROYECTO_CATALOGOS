@@ -21,7 +21,11 @@ namespace PROYECTO_CATALOGOS.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Products.ToListAsync());
+            CATALOGOS.BUSINESS.Products manageProducts = new CATALOGOS.BUSINESS.Products(_context);
+
+            IEnumerable<Product> productList = manageProducts.GetAllProducts();           
+
+            return View(productList);
         }
 
         // GET: Products/Details/5
@@ -105,39 +109,37 @@ namespace PROYECTO_CATALOGOS.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                if (ProductImage != null && ProductImage.Length > 0)
                 {
-                    if (ProductImage != null && ProductImage.Length > 0)
-                    {
-                        // Ruta donde se guardará la imagen
-                        var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", ProductImage.FileName);
+                    // Ruta donde se guardará la imagen
+                    var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", ProductImage.FileName);
 
-                        // Guardar la imagen en la ruta especificada
-                        using (var stream = new FileStream(imagePath, FileMode.Create))
-                        {
-                            await ProductImage.CopyToAsync(stream);
-                        }
-                    }
-
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
+                    // Guardar la imagen en la ruta especificada
+                    using (var stream = new FileStream(imagePath, FileMode.Create))
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        await ProductImage.CopyToAsync(stream);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                _context.Update(product);
+                await _context.SaveChangesAsync();
             }
-            return View(product);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(product.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+
+            //return View(product);
         }
 
         // GET: Products/Delete/5
