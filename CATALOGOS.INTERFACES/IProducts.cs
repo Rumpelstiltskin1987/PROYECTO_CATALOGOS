@@ -11,10 +11,10 @@ namespace CATALOGOS.INTERFACES
     public interface IProducts
     {
         IEnumerable<Product> GetAllProducts();
-        Product GetProductById(int id);
+        Product GetProductById(int Id);
         Product GetByProductName(string name);
-        void AddProduct(Product product);
-        void UpdateProduct(Product product);  
-        void DeleteProduct(Product product);
+        string AddProduct(Product product);
+        string UpdateProduct(Product product);
+        string DeleteProduct(int Id);
     }
 }

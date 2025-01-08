@@ -5,15 +5,19 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<h1>Editar Producto</h1>
 
-<h4>Product</h4>
+@* <h4>Producto</h4> *@
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreateUser" />
+            <input type="hidden" asp-for="CreateDate" />
+            <input type="hidden" asp-for="UpdateUser" />
+            <input type="hidden" asp-for="UpdateDate" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label">Nombre</label>
                 <input asp-for="Name" class="form-control" />
@@ -35,7 +39,7 @@
                 <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>
             <div class="form-group" style="display:none;">
-                <label asp-for="UrlImage" class="control-label">Ruta Imagen</label>
+                <label asp-for="UrlImage" class="control-label"></label>
                 <input asp-for="UrlImage" class="form-control" />
                 <span asp-validation-for="UrlImage" class="text-danger"></span>
             </div>
@@ -43,9 +47,24 @@
                 <label for="ProductImage" class="control-label">Imagen del Producto</label>
                 <input type="file" id="ProductImage" name="ProductImage" class="form-control" onchange="updateUrlImage()" />
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+            <br />
+            <table>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="submit" value="Actualizar" class="btn btn-primary" />
+                        </div>
+                    </td>
+                    <td>
+                        &nbsp;&nbsp;
+                    </td>
+                    <td>
+                        <div>
+                            <a asp-action="Index">Volver al listado</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>            
         </form>
     </div>
     <div class="col-md-4">
@@ -53,9 +72,9 @@
     </div>
 </div>
 
-<div>
+@* <div>
     <a asp-action="Index">Volver al listado</a>
-</div>
+</div> *@
 
 @section Scripts {
     @{

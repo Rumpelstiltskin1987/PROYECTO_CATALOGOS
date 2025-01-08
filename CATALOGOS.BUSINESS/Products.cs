@@ -1,5 +1,6 @@
 ﻿using DataAccess;
 using CATALOGOS.INTERFACES;
+using CATALOGOS.CORE;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,59 +8,89 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Humanizer.Configuration;
+using System.Xml.Linq;
 
 namespace CATALOGOS.BUSINESS
 {
-    public class Products : IProducts
+    public class BusinessProducts : IProducts
     {
-        private readonly MySQLiteContext _context;
-        public Products(MySQLiteContext context)
+        private readonly MySQLiteContext _contextConnection;
+        private readonly CoreProducts _products;
+        public BusinessProducts(MySQLiteContext context)
         {
-            _context = context;
+            _contextConnection = context;
+            _products = new CoreProducts(_contextConnection);  
         }
         public IEnumerable<Product> GetAllProducts()
         {
-            IEnumerable<Product> productList = new List<Product>();
-
             try
             {
-                productList = _context.Products.ToList();
-            }
-            catch (Exception ex)
-            {
-
+                return _products.GetAllProducts();
             }
             finally
             {
-
+                this._products.Dispose();
             }
-
-            return productList;
         }
 
-        public Product GetProductById(int id)
+        public Product GetProductById(int Id)
         {
-            return new Product();
+            try
+            {
+                return _products.GetProductById(Id);
+            }
+            finally
+            {
+                this._products.Dispose();
+            }
         }
 
         public Product GetByProductName(string name)
         {
-            return new Product();
+            try
+            {
+                return _products.GetByProductName(name);
+            }
+            finally
+            {
+                this._products.Dispose();
+            }
         }
 
-        void IProducts.AddProduct(Product product)
+        public string AddProduct(Product product)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _products.AddProduct(product);
+            }
+            finally
+            {
+                this._products.Dispose();
+            }
         }
 
-        void IProducts.UpdateProduct(Product product)
+        public string UpdateProduct(Product product)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _products.UpdateProduct(product);
+            }
+            finally
+            {
+                this._products.Dispose();
+            }
         }
 
-        void IProducts.DeleteProduct(Product product)
+        public string DeleteProduct(int Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _products.DeleteProduct(Id);
+            }
+            finally
+            {
+                this._products.Dispose();
+            }
         }
     }
 }

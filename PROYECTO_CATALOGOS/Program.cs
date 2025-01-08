@@ -1,3 +1,6 @@
+using CATALOGOS.BUSINESS;
+using CATALOGOS.CORE;
+using CATALOGOS.INTERFACES;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +12,11 @@ builder.Services.AddControllersWithViews();
 // Register the DbContext with the dependency injection container
 builder.Services.AddDbContext<MySQLiteContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("MySQLiteContext")));
+
+// Register the IProducts interface and its implementation
+//builder.Services.AddScoped<IProducts, CoreProducts>();
+//builder.Services.AddScoped<IProducts, BusinessProducts>();
+//builder.Services.AddScoped<BusinessProducts>();
 
 var app = builder.Build();
 

@@ -6,38 +6,38 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
+using CATALOGOS.BUSINESS;
 
 namespace PROYECTO_CATALOGOS.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly MySQLiteContext _context;
+        private readonly BusinessProducts _manageProducts;
 
         public ProductsController(MySQLiteContext context)
         {
             _context = context;
+            _manageProducts = new BusinessProducts(_context);
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            CATALOGOS.BUSINESS.Products manageProducts = new CATALOGOS.BUSINESS.Products(_context);
+            IEnumerable<Product> productList = new List<Product>();
 
-            IEnumerable<Product> productList = manageProducts.GetAllProducts();           
+            productList = _manageProducts.GetAllProducts();
 
             return View(productList);
         }
 
         // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int Id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            Product product = new Product();
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+            product = _manageProducts.GetProductById(Id);
+
             if (product == null)
             {
                 return NotFound();
@@ -59,41 +59,42 @@ namespace PROYECTO_CATALOGOS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,Quantity,UrlImage")] Product product, IFormFile ProductImage)
         {
-            if (ModelState.IsValid)
-            {
-                if (ProductImage != null && ProductImage.Length > 0)
-                {
-                    // Ruta donde se guardará la imagen
-                    var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", ProductImage.FileName);
+            string message = string.Empty;
 
-                    // Guardar la imagen en la ruta especificada
-                    using (var stream = new FileStream(imagePath, FileMode.Create))
-                    {
-                        await ProductImage.CopyToAsync(stream);
-                    }
+            message = _manageProducts.AddProduct(product);
+
+            if (ProductImage != null && ProductImage.Length > 0 && message == "Producto registrado")
+            {
+                // Ruta donde se guardará la imagen
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", ProductImage.FileName);
+
+                // Guardar la imagen en la ruta especificada
+                using (var stream = new FileStream(imagePath, FileMode.Create))
+                {
+                    await ProductImage.CopyToAsync(stream);
                 }
 
-                _context.Add(product);
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            else
+            {
+                return View(product);
+            }
         }
 
 
         // GET: Products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int Id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            Product product = new Product();
 
-            var product = await _context.Products.FindAsync(id);
+            product = _manageProducts.GetProductById(Id);
+
             if (product == null)
             {
                 return NotFound();
             }
+
             return View(product);
         }
 
@@ -102,16 +103,15 @@ namespace PROYECTO_CATALOGOS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Quantity,UrlImage")] Product product, IFormFile ProductImage)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Quantity,UrlImage,CreateUser,CreateDate,UpdateUser,UpdateDate")] Product product, IFormFile ProductImage)
         {
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
+            string message = string.Empty;
+
+            message = _manageProducts.UpdateProduct(product);
 
             try
             {
-                if (ProductImage != null && ProductImage.Length > 0)
+                if (ProductImage != null && ProductImage.Length > 0 && message == "Producto actualizado")
                 {
                     // Ruta donde se guardará la imagen
                     var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", ProductImage.FileName);
@@ -122,9 +122,6 @@ namespace PROYECTO_CATALOGOS.Controllers
                         await ProductImage.CopyToAsync(stream);
                     }
                 }
-
-                _context.Update(product);
-                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -134,24 +131,21 @@ namespace PROYECTO_CATALOGOS.Controllers
                 }
                 else
                 {
-                    throw;
+                    return View(product);
                 }
             }
+
             return RedirectToAction(nameof(Index));
 
-            //return View(product);
         }
 
         // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int Id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            Product product = new Product();
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+            product = _manageProducts.GetProductById(Id);
+
             if (product == null)
             {
                 return NotFound();
@@ -163,15 +157,10 @@ namespace PROYECTO_CATALOGOS.Controllers
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int Id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-            }
+            _manageProducts.DeleteProduct(Id);
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
